@@ -146,4 +146,10 @@ class ScreenCapture:
         except ImportError:
             results["mss"] = False
 
+        try:
+            import tkinter
+            results["tkinter"] = True
+        except ImportError:
+            results["tkinter"] = False
+
         return results

@@ -13,6 +13,7 @@ import os
 import time
 import threading
 import signal
+import queue
 
 # Ensure package is importable when run directly
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -28,12 +29,15 @@ from spectra.tui import (
 from spectra.network import get_local_ip, get_hostname, find_free_port, print_qr_panel
 from spectra.server import SpectraServer
 from spectra.capture import ScreenCapture
+from spectra.mirror_window import MirrorWindow
 
 
 # ─── Global state ─────────────────────────────────────────────────────────────
 
 _server: SpectraServer = None
 _capture: ScreenCapture = None
+_mirror_window: MirrorWindow = None
+_frame_queue: queue.Queue = None
 _status = StatusPanel()
 _running = True
 
@@ -76,7 +80,7 @@ def boot_sequence():
 
 def run_server(quality: str = "medium"):
     """Start the mirror server session"""
-    global _server, _capture
+    global _server, _capture, _mirror_window, _frame_queue
 
     clear()
     print_logo(animated=False)
@@ -85,6 +89,9 @@ def run_server(quality: str = "medium"):
     ip   = get_local_ip()
     port = find_free_port(7799)
     name = get_hostname()
+
+    # Create shared frame queue
+    _frame_queue = queue.Queue(maxsize=2)
 
     # ── Update status
     _status.update("server",  "STARTING…",  C.YELLOW)
@@ -104,27 +111,37 @@ def run_server(quality: str = "medium"):
         _status.update("clients",   "0",    C.GRAY)
         _status.update("mirroring", "IDLE", C.GRAY)
         print(f"\n  {C.RED}◎{C.RESET}  {C.GRAY}Client disconnected:{C.RESET} {addr[0]}")
+        global _mirror_window
+        if _mirror_window:
+            _mirror_window.stop()
+            _mirror_window = None
 
     def on_message(addr, data):
+        global _mirror_window
         msg_type = data.get("type", "unknown")
 
         if msg_type == "hello":
             device = data.get("device", "unknown")
             _status.update("mirroring", "ACTIVE ●", C.GREEN)
             print(f"\n  {C.PURPLE}⬡{C.RESET}  {C.WHITE}Device handshake:{C.RESET} {C.LAVENDER}{device}{C.RESET}")
-            # Start streaming frames
+
+            if not _mirror_window:
+                _mirror_window = MirrorWindow(_frame_queue)
+                _mirror_window.start()
+                print(f"  {C.CYAN}→{C.RESET}  Mirror window opened")
+
             _start_capture()
 
         elif msg_type == "touch":
             x, y = data.get("x", 0), data.get("y", 0)
-            # Here you'd inject the touch event into the OS
-            # For now we log it
             pass
 
         elif msg_type == "pong":
             ts = data.get("ts", 0)
             latency_ms = int((time.time() - ts) * 1000)
             _status.update("mirroring", f"ACTIVE ● {latency_ms}ms", C.GREEN)
+            if _mirror_window:
+                _mirror_window.set_latency(latency_ms)
 
     _server = SpectraServer(
         ip="0.0.0.0",
@@ -132,6 +149,7 @@ def run_server(quality: str = "medium"):
         on_client_connect=on_connect,
         on_client_disconnect=on_disconnect,
         on_message=on_message,
+        frame_queue=_frame_queue,
     )
 
     sp = Spinner("Binding WebSocket server…", color=C.PURPLE)
@@ -335,6 +353,7 @@ def show_diagnostics():
         "",
         label("Pillow (capture)",  dep_badge(deps.get("pillow")),  vcolor=C.WHITE),
         label("mss (fast capture)",dep_badge(deps.get("mss")),     vcolor=C.WHITE),
+        label("tkinter (mirror)",  dep_badge(deps.get("tkinter")), vcolor=C.WHITE),
         "",
     ]
 
@@ -397,13 +416,16 @@ def show_main_menu():
 # ─── Shutdown ─────────────────────────────────────────────────────────────────
 
 def _shutdown():
-    global _running
+    global _running, _mirror_window
     _running = False
 
     print()
     sp = Spinner("Shutting down…", color=C.RED)
     sp.start()
 
+    if _mirror_window:
+        _mirror_window.stop()
+        _mirror_window = None
     if _capture:
         _capture.stop()
     if _server:

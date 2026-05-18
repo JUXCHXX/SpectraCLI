@@ -7,7 +7,10 @@ import asyncio
 import json
 import time
 import threading
+import base64
+import io
 from typing import Callable, Optional
+from queue import Queue
 
 
 class SpectraServer:
@@ -23,12 +26,14 @@ class SpectraServer:
         on_client_connect: Optional[Callable] = None,
         on_client_disconnect: Optional[Callable] = None,
         on_message: Optional[Callable] = None,
+        frame_queue: Optional[Queue] = None,
     ):
         self.ip = ip
         self.port = port
         self.on_client_connect = on_client_connect
         self.on_client_disconnect = on_client_disconnect
         self.on_message = on_message
+        self.frame_queue = frame_queue
 
         self.clients: set = set()
         self.running = False
@@ -41,6 +46,7 @@ class SpectraServer:
             "bytes_sent": 0,
             "messages_received": 0,
         }
+        self.last_ping_ts = 0
 
     async def _handler(self, websocket):
         """Handle a new WebSocket connection"""
@@ -66,6 +72,16 @@ class SpectraServer:
                     data = json.loads(raw)
                     if self.on_message:
                         self.on_message(client_addr, data)
+
+                    if data.get("type") == "frame" and self.frame_queue:
+                        try:
+                            from PIL import Image
+                            img_bytes = base64.b64decode(data.get("data", ""))
+                            img = Image.open(io.BytesIO(img_bytes))
+                            self.frame_queue.put_nowait(img)
+                        except Exception:
+                            pass
+
                 except json.JSONDecodeError:
                     pass
 
