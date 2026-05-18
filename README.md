@@ -1,268 +1,245 @@
-# ⬡ Spectra
-
-> **Espeja la pantalla de tu teléfono en tu PC por WiFi — sin cables, en tiempo real.**
+<div align="center">
 
 ```
-       .::::::..............................:::----:.
-    .---..                                        .:-+=.
-   =*-                                                -#+.
- .++.                                                   =+.
-.=-                                                      :=.
+███████╗██████╗ ███████╗ ██████╗████████╗██████╗  █████╗ 
+██╔════╝██╔══██╗██╔════╝██╔════╝╚══██╔══╝██╔══██╗██╔══██╗
+███████╗██████╔╝█████╗  ██║        ██║   ██████╔╝███████║
+╚════██║██╔═══╝ ██╔══╝  ██║        ██║   ██╔══██╗██╔══██║
+███████║██║     ███████╗╚██████╗   ██║   ██║  ██║██║  ██║
+╚══════╝╚═╝     ╚══════╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝
+```
+
+**Mirror and control your phone screen from your PC — no cables, no cloud, no limits.**
+
+[![Python](https://img.shields.io/badge/Python-3.8%2B-8B5CF6?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![WebSocket](https://img.shields.io/badge/WebSocket-RFC%206455-7C3AED?style=for-the-badge&logo=websocket&logoColor=white)](https://websockets.readthedocs.io)
+[![React](https://img.shields.io/badge/React-18-06B6D4?style=for-the-badge&logo=react&logoColor=white)](https://react.dev)
+[![Capacitor](https://img.shields.io/badge/Capacitor-5-119EFF?style=for-the-badge&logo=capacitor&logoColor=white)](https://capacitorjs.com)
+[![License](https://img.shields.io/badge/License-MIT-A855F7?style=for-the-badge)](LICENSE)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-6D28D9?style=for-the-badge)](https://github.com/yourname/spectra)
+
+<br/>
+
+<!-- LOGO PLACEHOLDER -->
+<!-- <img src="assets/spectra-logo.png" alt="Spectra Logo" width="200"/> -->
+
+</div>
+
+---
+
+## 🖥️ Terminal Preview
+
+<!-- TERMINAL SCREENSHOT PLACEHOLDER -->
+> 📸 *Add a screenshot of Spectra running in your terminal here*
+<!-- <img src="assets/terminal-preview.png" alt="Spectra Terminal" width="100%"/> -->
+
+---
+
+## 📱 Mobile Preview
+
+<!-- MOBILE SCREENSHOT PLACEHOLDER -->
+> 📸 *Add a screenshot of the Spectra app on your phone here*
+<!-- <img src="assets/mobile-preview.png" alt="Spectra Mobile App" width="300"/> -->
+
+---
+
+## ✨ What is Spectra?
+
+Spectra is a **local WiFi screen mirroring tool** made up of two parts:
+
+| Part | Description |
+|------|-------------|
+| 🖥️ **Spectra CLI** | Python server that runs on your PC, generates a QR code and receives screen frames |
+| 📱 **Spectra App** | Android/iOS app that captures your phone screen and sends it to your PC in real time |
+
+Everything happens **on your local network** — no internet required, no data sent to any cloud, no subscriptions.
+
+---
+
+## ⚡ How It Works
+
+```
+  PC (server)                WiFi                 Phone (client)
+  ───────────               ──────               ───────────────
+  spectra start   ─────────────────────────────►  Open Spectra App
+  Opens port 7799                                  Scan QR code
+  Shows QR with IP ◄───────────────────────────── Reads IP + port
+  Accepts connection ◄──────────────────────────  Connects via WebSocket
+  Receives frames  ◄────────────────────────────  Sends screen frames
+  Shows mirror win.          real-time            Captures screen @ 24fps
 ```
 
 ---
 
-## 📱 ¿Qué es Spectra?
+## 🛠️ Tech Stack
 
-**Spectra** es una herramienta de espejo de pantalla en tiempo real que conecta tu teléfono Android o iOS con tu PC a través de WiFi local.
+<div align="center">
 
-- ✅ **Espejo en vivo**: Ve la pantalla de tu teléfono en una ventana flotante en tu PC
-- ✅ **Métricas en tiempo real**: Muestra FPS y latencia en el título de la ventana
-- ✅ **Sin cables**: Funciona completamente por WiFi en tu red local
-- ✅ **Fácil de usar**: Solo escanea un código QR desde tu terminal
-- ✅ **Multiplataforma**: Funciona en Windows, macOS y Linux
+| Layer | Technology |
+|-------|-----------|
+| 🐍 Server | Python 3.8+ |
+| 🔌 Protocol | WebSockets (RFC 6455) |
+| 📸 Capture | Pillow + MSS |
+| 📡 QR Code | qrcode[pil] |
+| 🖼️ Mirror Window | Tkinter |
+| 📱 Mobile App | React + TypeScript |
+| 📲 Native Bridge | Capacitor 5 |
+| 🎨 UI | Tailwind CSS |
 
-**Caso de uso**: Útil para:
-- Demostrar tu teléfono en presentaciones
-- Grabar tutoriales
-- Debugging de aplicaciones
-- Captura de pantalla de alta calidad
+</div>
 
 ---
 
-## 🚀 Instalación
+## 📋 Requirements
 
-### Paso 1: Descargar el repositorio
+### PC Side (this repo)
+- Python **3.8 or higher**
+- Windows, macOS or Linux
+- Connected to **local WiFi**
+
+### Phone Side
+- Android **8.0+** or iOS **13+**
+- **Spectra APK** installed (see below ↓)
+- Connected to the **same WiFi network** as your PC
+
+> ⚠️ **Both devices must be on the same WiFi network.** Mobile data will NOT work.
+
+---
+
+## 📲 Step 1 — Install the Spectra App on your phone
+
+Before running the PC server, you need the Spectra app on your Android phone.
+
+**Download the APK:**
+
+```
+https://github.com/yourname/spectra/releases/latest
+```
+
+1. Download `spectra-release.apk` from the Releases page
+2. On your Android phone, go to **Settings → Security → Install unknown apps** and enable it for your browser or file manager
+3. Open the downloaded APK and tap **Install**
+4. Open the **Spectra** app — you'll see the QR scanner screen
+
+> 🍎 **iOS users:** iOS sideloading requires TestFlight or a developer build. See [iOS Setup](docs/ios-setup.md) for instructions.
+
+---
+
+## 💻 Step 2 — Install the PC Server
+
+### Option A — Install from GitHub (recommended)
+
+```bash
+# Clone the repo
+git clone https://github.com/yourname/spectra.git
+cd spectra
+
+# Create a virtual environment
+python -m venv .venv
+
+# Activate it
+# Windows:
+.venv\Scripts\activate
+# macOS / Linux:
+source .venv/bin/activate
+
+# Install dependencies
+pip install websockets Pillow qrcode mss
+
+# Install Spectra
+pip install -e .
+```
+
+### Option B — Run without installing
 
 ```bash
 git clone https://github.com/yourname/spectra.git
 cd spectra
+pip install websockets Pillow qrcode mss
+python -m spectra.cli
 ```
-
-### Paso 2: Instalar dependencias
-
-```bash
-pip install -e .
-```
-
-Esto instala automáticamente:
-- `websockets` - Comunicación en tiempo real
-- `qrcode` - Generación de códigos QR
-- `Pillow` - Procesamiento de imágenes
-
-### Verificar la instalación
-
-```bash
-spectra --version
-```
-
-Deberías ver: `Spectra 0.1.0`
 
 ---
 
-## ⚙️ Configuración de dependencias (Opcional)
-
-Para una captura más rápida en Windows/Mac:
-
-```bash
-pip install mss
-```
-
-Para usar la ventana espejo, necesitas:
-- **Windows**: Viene preinstalado
-- **macOS**: Viene preinstalado  
-- **Linux**: `sudo apt-get install python3-tk`
-
----
-
-## 📖 Cómo usar Spectra
-
-### Opción 1: Menú interactivo (Recomendado)
+## 🚀 Step 3 — Start Mirroring
 
 ```bash
 spectra
 ```
 
-Se abrirá un menú donde puedes:
-1. **Start mirroring** - Inicia el servidor y muestra código QR
-2. **Diagnostics** - Verifica dependencias y configuración
-3. **Settings** - Configura calidad, puerto, nombre del dispositivo
-4. **About** - Información de versión
+You'll see the animated boot sequence, then the main menu. Select **Start Mirroring**.
 
-### Opción 2: Iniciar servidor directamente
+Spectra will:
+1. Detect your local IP automatically
+2. Show a **QR code** in the terminal
+3. Open a floating **Mirror Window** on your PC
+4. Wait for your phone to connect
+
+On your phone, open the Spectra app and **scan the QR code**. The mirror window will start showing your phone screen in real time.
+
+---
+
+## 🎛️ CLI Commands
+
+Once the server is running, use these keyboard shortcuts:
+
+| Key | Action |
+|-----|--------|
+| `s` | Show status panel |
+| `r` | Refresh QR code |
+| `m` | Back to main menu |
+| `q` | Quit Spectra |
+| `Ctrl+C` | Force quit |
+
+---
+
+## 📦 CLI Arguments
 
 ```bash
-spectra start
+spectra              # Launch interactive menu
+spectra start        # Start mirror server directly
+spectra diag         # Run system diagnostics
+spectra --version    # Show version
+spectra --help       # Show help
 ```
 
-Inicia inmediatamente el servidor sin menú.
+---
 
-### Opción 3: Ejecutar diagnósticos
+## 🔧 Troubleshooting
 
+**Mirror window is black / no image:**
+> Make sure you opened the Spectra app and it shows "Connected". The phone must send a `hello` message before streaming starts.
+
+**Can't connect / QR doesn't work:**
+> Both devices must be on the same WiFi. Check your PC firewall — allow Python on port `7799`.
+
+**`ModuleNotFoundError: No module named 'websockets'`:**
 ```bash
-spectra diag
+pip install websockets Pillow qrcode mss
 ```
 
-Verifica que todas las dependencias estén correctamente instaladas.
-
----
-
-## 🔄 Flujo completo paso a paso
-
-### En tu PC:
-
-**1.** Abre una terminal en la carpeta del proyecto:
+**`pip install -e .` fails:**
 ```bash
-cd ~/spectra
+pip install --upgrade setuptools pip
+pip install -e .
 ```
 
-**2.** Inicia Spectra:
-```bash
-spectra start
-```
-
-Verás algo así en la terminal:
-
-```
-╔══════════════════════════════════════╗
-║         SPECTRA  v0.1.0             ║
-║    Screen Mirror • Terminal App      ║
-╚══════════════════════════════════════╝
-
-───────────────────────────────────────
-
-✓ Spectra 0.1.0 ready!
-
-◈ Starting server
-
-✓ WebSocket server running on port 7799
-
-◈ Connection QR Code
-
-[Código QR aquí]
-
-Commands:  [q] Quit  [s] Status  [r] Refresh QR  [m] Menu
-```
-
-**3.** Copia la IP que aparece (ej: `192.168.1.100`)
-
-### En tu teléfono:
-
-**1.** Abre la app Spectra (disponible en Google Play / App Store)
-
-**2.** Toca **"Escanear código QR"**
-
-**3.** Apunta la cámara al código QR que ves en tu PC
-
-**4.** La app se conectará automáticamente
-
-### De vuelta en tu PC:
-
-**✅ Tu pantalla de teléfono aparecerá en una ventana flotante**
-
-- Verás el FPS en tiempo real
-- Verás la latencia en ms
-- Puedes redimensionar la ventana
-- La ventana siempre estará al frente
+**Port 7799 already in use:**
+> Spectra will automatically find the next available port and update the QR code.
 
 ---
 
-## 🎮 Controles durante la sesión
-
-| Tecla | Acción |
-|-------|--------|
-| `q` | Salir y detener espejo |
-| `s` | Mostrar estado |
-| `r` | Refrescar código QR |
-| `m` | Abrir menú |
-
----
-
-## 📊 Tabla de dependencias
-
-| Paquete | Propósito | Estado |
-|---------|-----------|--------|
-| `websockets` | Protocolo WebSocket | **Requerido** |
-| `qrcode` | Generar códigos QR | **Requerido** |
-| `Pillow` | Procesamiento de imágenes | **Requerido** |
-| `tkinter` | Ventana flotante GUI | **Requerido** |
-| `mss` | Captura rápida | Opcional |
-
----
-
-## 🖼️ Capturas de pantalla
-
-### Terminal con código QR
-![Placeholder for terminal QR code](https://via.placeholder.com/800x400?text=Terminal+QR+Code)
-
-### Ventana espejo flotante
-![Placeholder for mirror window](https://via.placeholder.com/800x400?text=Floating+Mirror+Window)
-
-### Contador de FPS y latencia
-![Placeholder for FPS counter](https://via.placeholder.com/800x400?text=FPS+Counter+Display)
-
----
-
-## 🔧 Solución de problemas
-
-### ❌ Error: "Module not found: tkinter"
-
-**Linux:**
-```bash
-sudo apt-get install python3-tk
-```
-
-**macOS:**
-```bash
-brew install python-tk
-```
-
----
-
-### ❌ Error: "Module not found: websockets"
-
-```bash
-pip install websockets
-```
-
----
-
-### ❌ La ventana espejo no aparece
-
-1. Verifica que tkinter esté instalado: `spectra diag`
-2. Verifica que Pillow esté instalado: `pip install Pillow`
-3. Asegúrate de que el teléfono está conectado
-
----
-
-### ❌ La pantalla se ve entrecortada o lenta
-
-1. Baja la calidad: Menú → Settings → Quality → Low
-2. Acércate al router WiFi
-3. Reduce otro tráfico de red
-
----
-
-### ❌ No puedo ver el teléfono en la red
-
-- ✅ Ambos (PC y teléfono) **deben estar en la misma red WiFi**
-- ✅ Verifica que el cortafuegos no bloquea puerto 7799
-- ✅ Intenta con un puerto diferente: Menú → Settings → Port
-
----
-
-## 📁 Estructura del proyecto
+## 🗂️ Project Structure
 
 ```
 spectra/
 ├── spectra/
-│   ├── __init__.py          # Versión
-│   ├── cli.py               # Entrada principal y TUI
-│   ├── tui.py               # Componentes de interfaz terminal
-│   ├── server.py            # Servidor WebSocket
-│   ├── mirror_window.py     # Ventana flotante tkinter
-│   ├── network.py           # Detección IP, generación QR
-│   └── capture.py           # Motor de captura de pantalla
+│   ├── __init__.py       # Version info
+│   ├── cli.py            # Main entry point + TUI
+│   ├── server.py         # WebSocket server
+│   ├── capture.py        # Screen capture engine
+│   ├── network.py        # IP detection + QR generation
+│   └── tui.py            # Terminal UI components
 ├── setup.py
 ├── pyproject.toml
 └── README.md
@@ -270,52 +247,28 @@ spectra/
 
 ---
 
-## 🔐 Requisitos
+## 🤝 Contributing
 
-- **Python 3.9+**
-- **Red WiFi local** (PC y teléfono en la misma red)
-- **App Spectra** instalada en tu teléfono
+Pull requests are welcome. For major changes, please open an issue first.
 
----
-
-## 📝 Cómo funciona internamente
-
-```
-Terminal PC              WiFi (red local)           Teléfono
-──────────              ────────────────           ─────────
-spectra start    ←──────────────────────────→   App Spectra
-muestra QR                                       escanea QR
-abre puerto 7799 ←────── WebSocket ─────────→   se conecta
-transmite pantalla ←──────────────────────────→ muestra espejo
-recibe gestos    ←──────────────────────────→   envía toques
-```
-
-**Paso a paso:**
-
-1. Ejecutas `spectra start` en tu PC
-2. La app Spectra escanea el código QR
-3. Se abre una conexión WebSocket
-4. Tu PC envía frames de pantalla codificados en base64
-5. Tu teléfono los decodifica y muestra
-6. Los gestos se envían de vuelta (si lo implementas)
+1. Fork the repo
+2. Create your branch: `git checkout -b feature/your-feature`
+3. Commit: `git commit -m 'Add your feature'`
+4. Push: `git push origin feature/your-feature`
+5. Open a Pull Request
 
 ---
 
-## 📋 Características
+## 📄 License
 
-- 🪟 **Ventana flotante**: Siempre visible y redimensionable
-- 📊 **Métricas en vivo**: FPS y latencia en el título
-- 🔒 **Seguro**: Solo en red local
-- ⚡ **Bajo latency**: Optimizado para <50ms
-- 🎛️ **Presets de calidad**: Low/Medium/High/Ultra
-- 🖥️ **Multiplataforma**: Windows, macOS, Linux
+MIT © [yourname](https://github.com/yourname)
 
 ---
 
-## 📄 Licencia
+<div align="center">
 
-MIT — Usa libremente
+Made with 💜 and Python
 
----
+**[⬆ Back to top](#)**
 
-Hecho con 💜 por [Tu nombre](https://github.com/yourname)
+</div>
