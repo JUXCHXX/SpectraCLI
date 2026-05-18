@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "spectra-mirror"
+version = "0.1.0"
+description = "Mirror and control your phone screen from your PC over WiFi"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "websockets>=11.0",
+    "qrcode>=7.4",
+    "Pillow>=9.0",
+]
+
+[project.optional-dependencies]
+fast = ["mss>=9.0"]
+dev  = ["pytest", "black", "ruff"]
+
+[project.scripts]
+spectra = "spectra.cli:main"
+
+[project.urls]
+Homepage   = "https://github.com/yourname/spectra"
+Repository = "https://github.com/yourname/spectra"
+Issues     = "https://github.com/yourname/spectra/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["spectra*"]
